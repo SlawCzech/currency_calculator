@@ -1,5 +1,6 @@
 import {generateTag} from "./helpers.js";
 import currencyCodes from "./constants.js";
+import {getData} from "./api.js";
 
 
 function generateForm(){
@@ -64,9 +65,21 @@ function generateForm(){
         tagId: 'btnSubmit',
         tagText: 'Calculate',
         tagAttrs: [{type: 'type', value: 'submit'}],
-        tagEvents: [{type: 'click', cb: ()=>{
+        tagEvents: [{
+            type: 'click', cb: (event) => {
+                event.preventDefault();
+                const currencyFrom = document.querySelector('#currencyInput');
+                const currencyTo = document.querySelector('#currencyOutput');
+                const resultsRef = document.querySelector('.results');
 
-            }}]
+                Promise.all([getData(currencyFrom.value), getData(currencyTo.value)]).then((data) => {
+                    console.log(data);
+                    const result = (data[0].rates[0].mid/data[1].rates[0].mid * parseInt(inputAmountRef.value)).toFixed(4);
+                    resultsRef.innerText = `Za ${inputAmountRef.value} ${data[0].currency} możesz kupić ${result} ${data[1].currency}`;
+                })
+            }
+        }]
+
     })
     fragment.appendChild(btnRef);
 
